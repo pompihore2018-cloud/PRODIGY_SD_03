@@ -1,23 +1,135 @@
-# 📞 Contact Management System in C
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-A simple Contact Management System developed using the C programming language.  
-This project allows users to store, view, edit, and delete contact information using file handling.
+struct Contact {
+    char name[50];
+    char phone[20];
+    char email[50];
+};
 
----
+void addContact() {
+    struct Contact c;
+    FILE *fp = fopen("contacts.txt", "a");
 
-## 🚀 Features
-- Add new contacts
-- View saved contacts
-- Edit existing contacts
-- Delete contacts
-- File-based persistent storage
+    printf("Enter Name: ");
+    scanf(" %[^\n]", c.name);
+    printf("Enter Phone: ");
+    scanf(" %[^\n]", c.phone);
+    printf("Enter Email: ");
+    scanf(" %[^\n]", c.email);
 
----
+    fwrite(&c, sizeof(c), 1, fp);
+    fclose(fp);
 
-## 🛠️ Technologies Used
-- C Programming Language
-- File Handling
+    printf("✅ Contact Added Successfully!\n");
+}
 
----
+void viewContacts() {
+    struct Contact c;
+    FILE *fp = fopen("contacts.txt", "r");
 
-## 📂 File Structure
+    if (fp == NULL) {
+        printf("📭 No contacts found.\n");
+        return;
+    }
+
+    int i = 1;
+    while (fread(&c, sizeof(c), 1, fp)) {
+        printf("\nContact %d\n", i++);
+        printf("Name  : %s\n", c.name);
+        printf("Phone : %s\n", c.phone);
+        printf("Email : %s\n", c.email);
+    }
+
+    fclose(fp);
+}
+
+void deleteContact() {
+    struct Contact c;
+    FILE *fp = fopen("contacts.txt", "r");
+    FILE *temp = fopen("temp.txt", "w");
+
+    char name[50];
+    int found = 0;
+
+    printf("Enter name to delete: ");
+    scanf(" %[^\n]", name);
+
+    while (fread(&c, sizeof(c), 1, fp)) {
+        if (strcmp(c.name, name) != 0) {
+            fwrite(&c, sizeof(c), 1, temp);
+        } else {
+            found = 1;
+        }
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    remove("contacts.txt");
+    rename("temp.txt", "contacts.txt");
+
+    if (found)
+        printf("🗑️ Contact Deleted Successfully!\n");
+    else
+        printf("❌ Contact Not Found!\n");
+}
+
+void editContact() {
+    struct Contact c;
+    FILE *fp = fopen("contacts.txt", "r+");
+
+    char name[50];
+    int found = 0;
+
+    printf("Enter name to edit: ");
+    scanf(" %[^\n]", name);
+
+    while (fread(&c, sizeof(c), 1, fp)) {
+        if (strcmp(c.name, name) == 0) {
+            printf("Enter New Name: ");
+            scanf(" %[^\n]", c.name);
+            printf("Enter New Phone: ");
+            scanf(" %[^\n]", c.phone);
+            printf("Enter New Email: ");
+            scanf(" %[^\n]", c.email);
+
+            fseek(fp, -sizeof(c), SEEK_CUR);
+            fwrite(&c, sizeof(c), 1, fp);
+            found = 1;
+            break;
+        }
+    }
+
+    fclose(fp);
+
+    if (found)
+        printf("✏️ Contact Updated Successfully!\n");
+    else
+        printf("❌ Contact Not Found!\n");
+}
+
+int main() {
+    int choice;
+
+    while (1) {
+        printf("\n--- Contact Management System ---\n");
+        printf("1. Add Contact\n");
+        printf("2. View Contacts\n");
+        printf("3. Edit Contact\n");
+        printf("4. Delete Contact\n");
+        printf("5. Exit\n");
+        printf("Choose an option: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: addContact(); break;
+            case 2: viewContacts(); break;
+            case 3: editContact(); break;
+            case 4: deleteContact(); break;
+            case 5: exit(0);
+            default: printf("❌ Invalid choice!\n");
+        }
+    }
+}
