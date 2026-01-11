@@ -1,2 +1,25 @@
 # PRODIGY_SD_03
 simple contact management system
+# 📞 Contact Management System in C
+
+A simple Contact Management System developed using the C programming language.  
+This project allows users to store, view, edit, and delete contact information using file handling.
+
+---
+
+## 🚀 Features
+- Add new contacts
+- View saved contacts
+- Edit existing contacts
+- Delete contacts
+- File-based persistent storage
+
+---
+
+## 🛠️ Technologies Used
+- C Programming Language
+- File Handling
+
+---
+
+## 📂 File Structure
